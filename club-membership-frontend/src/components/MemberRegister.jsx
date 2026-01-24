@@ -63,7 +63,7 @@ export default function MemberRegister() {
       console.log([...data.entries()]);
 
       const res = await axios.post(
-        "http://localhost:5000/api/auth/register",
+        "https://membership-brown.vercel.app/api/auth/register",
         data,
         {
           headers: { "Content-Type": "multipart/form-data" },

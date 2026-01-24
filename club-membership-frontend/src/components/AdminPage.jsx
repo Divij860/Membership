@@ -26,7 +26,7 @@ export default function AdminPage() {
       setLoading(true);
       setError("");
       const res = await axios.get(
-        "http://localhost:5000/api/admin/pending-users",
+        "https://membership-brown.vercel.app/api/admin/pending-users",
         authHeader
       );
       setUsers(res.data.users || []);
@@ -49,7 +49,7 @@ export default function AdminPage() {
       setActionLoading(id);
       setError("");
       const res = await axios.put(
-        `http://localhost:5000/api/admin/approve/${id}`,
+        `https://membership-brown.vercel.app/api/admin/approve/${id}`,
         {},
         authHeader
       );
@@ -68,7 +68,7 @@ export default function AdminPage() {
       setActionLoading(id);
       setError("");
       await axios.put(
-        `http://localhost:5000/api/admin/reject/${id}`,
+        `https://membership-brown.vercel.app/api/admin/reject/${id}`,
         {},
         authHeader
       );
@@ -152,7 +152,7 @@ export default function AdminPage() {
               >
                 {user.photo ? (
                   <img
-                    src={`http://localhost:5000/uploads/${user.photo}`}
+                    src={`https://membership-brown.vercel.app/uploads/${user.photo}`}
                     alt={user.name}
                     className="w-20 h-20 rounded-full object-cover border"
                   />
@@ -169,7 +169,7 @@ export default function AdminPage() {
 
                   {user.paymentProof && (
                     <a
-                      href={`http://localhost:5000/uploads/${user.paymentProof}`}
+                      href={`https://membership-brown.vercel.app/uploads/${user.paymentProof}`}
                       target="_blank"
                       rel="noreferrer"
                       className="text-blue-600 text-sm"

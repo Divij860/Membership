@@ -26,7 +26,7 @@ export default function MemberDashboard() {
   if (!member) {
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-500">
-        Loading dashboard...
+        Membership Under Review Please come back later
       </div>
     );
   }
