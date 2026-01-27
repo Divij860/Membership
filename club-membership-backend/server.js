@@ -13,12 +13,10 @@ dotenv.config();
 
 const app = express();
 
-/* ======================
-   CORS CONFIG (IMPORTANT)
-====================== */
+
 const allowedOrigins = [
-  "http://localhost:5173", // Local frontend
-  "https://membership-front.vercel.app", // Production frontend
+  "http://localhost:5173", 
+  "https://membership-front.vercel.app",
 ];
 
 app.use(
