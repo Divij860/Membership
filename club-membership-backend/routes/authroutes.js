@@ -14,10 +14,7 @@ const getNextMembershipId = async () => {
   let nextNumber = 1;
 
   if (lastUser?.membershipId) {
-    const lastNumber = parseInt(
-      lastUser.membershipId.replace("KSASC", ""),
-      10
-    );
+    const lastNumber = parseInt(lastUser.membershipId.replace("KSASC", ""), 10);
     nextNumber = lastNumber + 1;
   }
 
@@ -25,7 +22,7 @@ const getNextMembershipId = async () => {
 };
 
 /* ======================
-   REGISTER (photos optional)
+   REGISTER (photo + payment REQUIRED)
 ====================== */
 router.post("/register", upload.any(), async (req, res) => {
   try {
@@ -34,11 +31,18 @@ router.post("/register", upload.any(), async (req, res) => {
     const { name, email, age, phone } = req.body;
     const files = req.files || [];
 
-    // Optional files
+    // 🔒 REQUIRED FILES
     const photo = files.find((f) => f.fieldname === "photo");
     const payment = files.find((f) => f.fieldname === "paymentProof");
 
-    // Required fields
+    if (!photo || !payment) {
+      return res.status(400).json({
+        success: false,
+        message: "Profile photo and payment proof are required",
+      });
+    }
+
+    // 🔒 REQUIRED FIELDS
     if (!name || !age || !phone) {
       return res.status(400).json({
         success: false,
@@ -46,7 +50,7 @@ router.post("/register", upload.any(), async (req, res) => {
       });
     }
 
-    // Check existing user
+    // 🔎 CHECK EXISTING USER
     const existingUser = await User.findOne({ phone });
     if (existingUser) {
       return res.status(409).json({
@@ -55,30 +59,50 @@ router.post("/register", upload.any(), async (req, res) => {
       });
     }
 
-    // Generate membership ID
-    const membershipId = await getNextMembershipId();
+    let createdUser = null;
+    let attempts = 0;
 
-    // Create user
-    const user = await User.create({
-      name,
-      email: email || null,
-      age,
-      phone,
+    while (!createdUser && attempts < 3) {
+      attempts++;
 
-      // Optional uploads
-      photo: photo?.secure_url || null,
-      photoId: photo?.public_id || null,
-      paymentProof: payment?.secure_url || null,
-      paymentProofId: payment?.public_id || null,
+      const membershipId = await getNextMembershipId();
 
-      membershipStatus: "pending_approval",
-      membershipId,
-    });
+      try {
+        createdUser = await User.create({
+          name,
+          email: email || null,
+          age,
+          phone,
+
+          photo: photo.secure_url,
+          photoId: photo.public_id,
+          paymentProof: payment.secure_url,
+          paymentProofId: payment.public_id,
+
+          membershipStatus: "pending_approval",
+          membershipId,
+        });
+      } catch (err) {
+        // Duplicate membershipId → retry
+        if (err.code === 11000 && err.keyPattern?.membershipId) {
+          console.warn("⚠️ Duplicate membershipId detected, retrying...");
+          continue;
+        }
+        throw err;
+      }
+    }
+
+    if (!createdUser) {
+      return res.status(500).json({
+        success: false,
+        message: "Could not generate unique membership ID. Please try again.",
+      });
+    }
 
     return res.status(201).json({
       success: true,
       message: "Registered successfully. Await admin approval.",
-      membershipId: user.membershipId,
+      membershipId: createdUser.membershipId,
     });
   } catch (err) {
     console.error("Register route error:", err);
@@ -109,7 +133,7 @@ router.post("/admin/login", (req, res) => {
     const token = jwt.sign(
       { role: "admin", username },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "1d" },
     );
 
     return res.json({

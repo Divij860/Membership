@@ -56,7 +56,6 @@ const userSchema = new mongoose.Schema(
     membershipId: {
       type: String,
       unique: true,
-      sparse: true,
     },
 
     // 🪪 Generated PDF (optional Cloudinary later)
