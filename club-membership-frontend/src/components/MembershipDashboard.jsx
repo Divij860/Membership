@@ -20,7 +20,7 @@ export default function MemberDashboard() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("member");
-    navigate("/login");
+    navigate("/");
   };
 
   if (!member) {

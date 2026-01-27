@@ -81,7 +81,7 @@ export default function AdminUserList() {
             Dashboard
           </button>
           <button
-            onClick={() => navigate("/admin/users")}
+            onClick={() => navigate("/users")}
             className="w-full text-left block px-4 py-2 rounded-lg hover:bg-gray-200 text-gray-700 font-medium"
           >
             Users

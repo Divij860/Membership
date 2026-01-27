@@ -20,7 +20,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/dashboard" element={<MemberDashboard userId={userId} />} />
         <Route path="/admin" element={<AdminPage />} />
-        <Route path="/Users" element={<UserList />} />
+        <Route path="/users" element={<UserList />} />
       </Routes>
     </Router>
   );
