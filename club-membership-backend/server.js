@@ -2,7 +2,6 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
-dotenv.config();
 
 import authRoutes from "./routes/authroutes.js";
 import userRoutes from "./routes/userRoutes.js";
@@ -10,8 +9,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 import membershipCardRoute from "./routes/Membershipcard.js";
 import memberAuthRoutes from "./routes/memberAuth.js";
 
-
-// 🔐 Load env FIRST
+dotenv.config();
 
 const app = express();
 
@@ -27,36 +25,34 @@ app.use((req, res, next) => {
   next();
 });
 
-
 /* ======================
-   ROUTES
-====================== */
-app.use("/api/auth", authRoutes)
-app.use("/api/member", memberAuthRoutes);
-app.use("/api/user", userRoutes);
-app.use("/api/admin", adminRoutes);
-app.use("/api", membershipCardRoute);
-
-/* ======================
-   DATABASE
-====================== */
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB connected"))
-  .catch((err) => console.error("❌ MongoDB error:", err));
-
-/* ======================
-   HEALTH CHECK
-====================== */
-app.get("/", (req, res) => {
-  res.send("✅ Club Membership API running");
-});
-
-/* ======================
-   SERVER
+   DATABASE + SERVER START
 ====================== */
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("✅ MongoDB connected");
+
+    /* ======================
+       ROUTES (AFTER DB CONNECT)
+    ====================== */
+    app.use("/api/auth", authRoutes);
+    app.use("/api/member", memberAuthRoutes);
+    app.use("/api/user", userRoutes);
+    app.use("/api/admin", adminRoutes);
+    app.use("/api", membershipCardRoute);
+
+    app.get("/", (req, res) => {
+      res.send("✅ Club Membership API running");
+    });
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("❌ MongoDB connection failed:", err);
+    process.exit(1); // 🔥 stop server if DB fails
+  });
