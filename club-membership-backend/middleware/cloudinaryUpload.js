@@ -1,26 +1,29 @@
 import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
-import cloudinary from "../config/cloudinary.js";
+import { cloudinary } from "../config/cloudinary.js";
 
 /* ======================
    CLOUDINARY STORAGE
 ====================== */
 const storage = new CloudinaryStorage({
-  cloudinary,
-  params: (req, file) => {
-    let folder = "members/others";
+  cloudinary: cloudinary, // ✅ explicitly pass v2 instance
+  params: async (req, file) => {
+    let folder = "uploads/others";
 
+    // ✅ Member profile photo
     if (file.fieldname === "photo") {
       folder = "members/photos";
     }
 
-    if (file.fieldname === "paymentProof") {
-      folder = "members/payments";
+    // ✅ Product main image
+    if (file.fieldname === "image") {
+      folder = "products/images";
     }
 
     return {
       folder,
-      allowed_formats: ["jpg", "jpeg", "png"],
+      resource_type: "image", // ✅ IMPORTANT
+      allowed_formats: ["jpg", "jpeg", "png", "webp"],
     };
   },
 });
@@ -29,12 +32,12 @@ const storage = new CloudinaryStorage({
    FILE FILTER
 ====================== */
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+  const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
 
   if (!allowedTypes.includes(file.mimetype)) {
     return cb(
-      new Error("Only JPG, JPEG, and PNG image files are allowed"),
-      false,
+      new Error("Only JPG, JPEG, PNG, and WEBP images are allowed"),
+      false
     );
   }
 

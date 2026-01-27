@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
+      trim: true,
     },
 
     email: {
@@ -17,53 +18,59 @@ const userSchema = new mongoose.Schema(
     age: {
       type: Number,
       required: true,
+      min: 10,
+      max: 100,
     },
 
     phone: {
       type: String,
       required: true,
       unique: true,
+      trim: true,
     },
 
-    // 📸 Cloudinary (profile photo)
+    /* ======================
+       CLOUDINARY PROFILE PHOTO
+    ====================== */
     photo: {
-      type: String, // Cloudinary URL
+      type: String, // Cloudinary secure_url
+      required: true,
     },
+
     photoId: {
       type: String, // Cloudinary public_id
+      required: true,
     },
 
-    // 💳 Cloudinary (payment proof)
-    paymentProof: {
-      type: String, // Cloudinary URL
-    },
-    paymentProofId: {
-      type: String, // Cloudinary public_id
-    },
-
+    /* ======================
+       MEMBERSHIP
+    ====================== */
     membershipStatus: {
       type: String,
       enum: [
         "registered",
-        "payment_pending",
         "pending_approval",
         "approved",
         "rejected",
       ],
-      default: "registered",
+      default: "pending_approval",
     },
 
     membershipId: {
       type: String,
       unique: true,
+      required: true,
     },
 
-    // 🪪 Generated PDF (optional Cloudinary later)
+    /* ======================
+       FUTURE USE (OPTIONAL)
+    ====================== */
     membershipCard: {
-      type: String, // URL if you ever upload PDF to Cloudinary
+      type: String, // URL (PDF or image if uploaded later)
+      default: null,
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 export default mongoose.model("User", userSchema);

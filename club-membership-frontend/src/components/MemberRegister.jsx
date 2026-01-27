@@ -11,7 +11,6 @@ export default function MemberRegister() {
   });
 
   const [photo, setPhoto] = useState(null);
-  const [paymentProof, setPaymentProof] = useState(null);
 
   const [membershipId, setMembershipId] = useState("");
   const [alreadyRegistered, setAlreadyRegistered] = useState(false);
@@ -38,19 +37,18 @@ export default function MemberRegister() {
     if (!/^\d{10}$/.test(formData.phone))
       newErrors.phone = "Phone number must be 10 digits";
 
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
+    if (
+      formData.email &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)
+    )
       newErrors.email = "Invalid email address";
 
-    // 🔒 REQUIRED FILES
+    // 🔒 REQUIRED PROFILE PHOTO
     if (!photo) newErrors.photo = "Profile photo is required";
-    if (!paymentProof) newErrors.paymentProof = "Payment proof is required";
 
     // 🔒 FILE SIZE (5MB)
     if (photo && photo.size > 5 * 1024 * 1024)
       newErrors.photo = "Photo must be under 5MB";
-
-    if (paymentProof && paymentProof.size > 5 * 1024 * 1024)
-      newErrors.paymentProof = "Payment proof must be under 5MB";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -70,16 +68,15 @@ export default function MemberRegister() {
       data.append("phone", formData.phone);
       if (formData.email) data.append("email", formData.email);
 
-      // 🔥 REQUIRED FILES (MATCH BACKEND FIELD NAMES)
+      // ✅ SINGLE REQUIRED IMAGE (MATCH BACKEND)
       data.append("photo", photo);
-      data.append("paymentProof", paymentProof);
 
       const res = await axios.post(
         "https://membership-brown.vercel.app/api/auth/register",
         data,
         {
           headers: { "Content-Type": "multipart/form-data" },
-        },
+        }
       );
 
       setMembershipId(res.data.membershipId);
@@ -89,7 +86,6 @@ export default function MemberRegister() {
       // Reset
       setFormData({ name: "", age: "", phone: "", email: "" });
       setPhoto(null);
-      setPaymentProof(null);
       setErrors({});
     } catch (err) {
       const message =
@@ -159,27 +155,17 @@ export default function MemberRegister() {
             <p className="text-red-500">{errors.age || errors.phone}</p>
           )}
 
-          {/* REQUIRED FILE UPLOADS */}
+          {/* REQUIRED PROFILE PHOTO */}
           <div>
-            <label className="block font-medium mb-1">Profile Photo *</label>
+            <label className="block font-medium mb-1">
+              Profile Photo <span className="text-red-500">*</span>
+            </label>
             <input
               type="file"
               accept="image/*"
               onChange={(e) => setPhoto(e.target.files[0])}
             />
             {errors.photo && <p className="text-red-500">{errors.photo}</p>}
-          </div>
-
-          <div>
-            <label className="block font-medium mb-1">Payment Proof *</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setPaymentProof(e.target.files[0])}
-            />
-            {errors.paymentProof && (
-              <p className="text-red-500">{errors.paymentProof}</p>
-            )}
           </div>
 
           <button className="w-full bg-blue-500 text-white py-3 rounded-lg">

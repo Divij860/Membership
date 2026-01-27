@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 
+import connectCloudinary from "./config/cloudinary.js";
+
 import authRoutes from "./routes/authroutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
@@ -13,16 +15,22 @@ dotenv.config();
 
 const app = express();
 
+/* ======================
+   CONNECT CLOUDINARY
+====================== */
+connectCloudinary();
 
+/* ======================
+   CORS CONFIG
+====================== */
 const allowedOrigins = [
-  "http://localhost:5173", 
+  "http://localhost:5173",
   "https://membership-front.vercel.app",
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (Postman, server-to-server)
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {

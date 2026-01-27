@@ -26,7 +26,7 @@ export default function MemberDashboard() {
   if (!member) {
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-500">
-        Membership Under Review Please come back later
+        Membership Under Review. Please come back later.
       </div>
     );
   }
@@ -66,17 +66,25 @@ export default function MemberDashboard() {
         <section className="bg-gradient-to-r from-indigo-600 to-blue-600 p-8 text-white">
           <div className="flex flex-col md:flex-row items-center gap-6">
             <img
-              src="https://via.placeholder.com/140"
-              alt="Profile"
-              className="w-32 h-32 rounded-full border-4 border-white object-cover"
+              src={member.photo || "/default-avatar.png"}
+              alt={member.name}
+              className={`w-32 h-32 rounded-full border-4 border-white object-cover ${
+                member.membershipStatus !== "approved" ? "blur-sm" : ""
+              }`}
             />
 
             <div className="text-center md:text-left">
               <h1 className="text-3xl font-bold">{member.name}</h1>
               <p className="opacity-90">{member.phone}</p>
 
-              <span className="inline-block mt-3 px-5 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">
-                APPROVED
+              <span
+                className={`inline-block mt-3 px-5 py-1 rounded-full text-sm font-medium ${
+                  member.membershipStatus === "approved"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-yellow-100 text-yellow-700"
+                }`}
+              >
+                {member.membershipStatus?.replace("_", " ").toUpperCase()}
               </span>
             </div>
           </div>
@@ -85,14 +93,18 @@ export default function MemberDashboard() {
         <section className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
           <InfoCard label="Full Name" value={member.name} />
           <InfoCard label="Phone Number" value={member.phone} />
-          <InfoCard label="Membership ID" value={member.membershipId} highlight />
+          <InfoCard
+            label="Membership ID"
+            value={member.membershipId}
+            highlight
+          />
         </section>
       </main>
     </div>
   );
 }
 
-/* INFO CARD */
+/* INFO CARD COMPONENT */
 function InfoCard({ label, value, highlight }) {
   return (
     <div

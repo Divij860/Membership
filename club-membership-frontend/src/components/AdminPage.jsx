@@ -6,7 +6,7 @@ export default function AdminPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null); // stores userId being approved/rejected
-  const [error, setError] = useState(""); // new: inline error messages
+  const [error, setError] = useState(""); // inline error messages
   const navigate = useNavigate();
 
   const token = localStorage.getItem("adminToken");
@@ -27,7 +27,7 @@ export default function AdminPage() {
       setError("");
       const res = await axios.get(
         "https://membership-brown.vercel.app/api/admin/pending-users",
-        authHeader
+        authHeader,
       );
       setUsers(res.data.users || []);
     } catch (err) {
@@ -51,7 +51,7 @@ export default function AdminPage() {
       const res = await axios.put(
         `https://membership-brown.vercel.app/api/admin/approve/${id}`,
         {},
-        authHeader
+        authHeader,
       );
       alert(`User approved! Membership ID: ${res.data.user.membershipId}`);
       fetchUsers();
@@ -70,7 +70,7 @@ export default function AdminPage() {
       await axios.put(
         `https://membership-brown.vercel.app/api/admin/reject/${id}`,
         {},
-        authHeader
+        authHeader,
       );
       fetchUsers();
     } catch (err) {
@@ -81,13 +81,11 @@ export default function AdminPage() {
     }
   };
 
-  // Logout
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
     navigate("/admin-login");
   };
 
-  // Check token and fetch users on mount
   useEffect(() => {
     if (!token) {
       navigate("/admin-login");
@@ -152,9 +150,11 @@ export default function AdminPage() {
               >
                 {user.photo ? (
                   <img
-                    src={`https://membership-brown.vercel.app/uploads/${user.photo}`}
+                    src={user.photo}
                     alt={user.name}
-                    className="w-20 h-20 rounded-full object-cover border"
+                    className={`w-20 h-20 rounded-full object-cover border ${
+                      user.membershipStatus !== "approved" ? "blur-sm" : ""
+                    }`}
                   />
                 ) : (
                   <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center">
@@ -163,13 +163,19 @@ export default function AdminPage() {
                 )}
 
                 <div className="flex-1">
-                  <p><b>Name:</b> {user.name}</p>
-                  <p><b>Email:</b> {user.email || "—"}</p>
-                  <p><b>Phone:</b> {user.phone}</p>
+                  <p>
+                    <b>Name:</b> {user.name}
+                  </p>
+                  <p>
+                    <b>Email:</b> {user.email || "—"}
+                  </p>
+                  <p>
+                    <b>Phone:</b> {user.phone}
+                  </p>
 
                   {user.paymentProof && (
                     <a
-                      href={`https://membership-brown.vercel.app/uploads/${user.paymentProof}`}
+                      href={user.paymentProof}
                       target="_blank"
                       rel="noreferrer"
                       className="text-blue-600 text-sm"
