@@ -1,27 +1,51 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function MemberDashboard() {
   const [member, setMember] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedMember = localStorage.getItem("member");
     const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
 
-    if (!storedMember || !token) {
-      navigate("/login");
+    if (!token || !userId) {
+      navigate("/");
       return;
     }
 
-    setMember(JSON.parse(storedMember));
+    axios
+      .get(`https://membership-brown.vercel.app/api/user/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // safe even if backend ignores it
+        },
+      })
+      .then((res) => {
+        setMember(res.data.user);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("FETCH USER ERROR:", err);
+        navigate("/");
+      });
   }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("member");
+    localStorage.removeItem("userId");
     navigate("/");
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
+        Loading dashboard...
+      </div>
+    );
+  }
 
   if (!member) {
     return (
@@ -97,6 +121,14 @@ export default function MemberDashboard() {
             label="Membership ID"
             value={member.membershipId}
             highlight
+          />
+          <InfoCard
+            label="Expiry Date"
+            value={
+              member.expiryDate
+                ? new Date(member.expiryDate).toLocaleDateString()
+                : "Not Available"
+            }
           />
         </section>
       </main>

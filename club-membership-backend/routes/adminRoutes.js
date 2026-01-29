@@ -42,7 +42,23 @@ router.put("/approve/:id", adminAuth, async (req, res) => {
       user.membershipId = `CLUB-${Date.now()}`;
     }
 
-    user.membershipStatus = "approved";
+    // ✅ ADD THIS LOGIC
+    const approvedAt = new Date();
+
+    const expiryDate = new Date(approvedAt);
+    expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+
+   const oneYear = 365 * 24 * 60 * 60 * 1000;
+
+await User.findByIdAndUpdate(id, {
+  membershipStatus: "approved",
+  approvedAt: new Date(),
+  expiryDate: new Date(Date.now() + oneYear),
+});
+
+    user.approvedAt = approvedAt;
+    user.expiryDate = expiryDate;
+
     await user.save();
 
     res.status(200).json({
@@ -56,6 +72,7 @@ router.put("/approve/:id", adminAuth, async (req, res) => {
     });
   }
 });
+
 
 /* =========================
    REJECT USER

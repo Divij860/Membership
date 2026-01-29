@@ -25,15 +25,14 @@ export default function Login() {
         {
           membershipId: formData.membershipId,
           phone: formData.phone,
-        }
+        },
       );
+      console.log("LOGIN RESPONSE 👉", res.data);
 
-      // ✅ Save auth data
+
+      // ✅ Save ONLY what is needed
       localStorage.setItem("token", res.data.token);
-      localStorage.setItem(
-        "member",
-        JSON.stringify(res.data.member)
-      );
+      localStorage.setItem("userId", res.data.userId);
 
       // ✅ Redirect to dashboard
       navigate("/dashboard");
@@ -41,12 +40,10 @@ export default function Login() {
       const msg = err.response?.data?.message;
 
       if (msg === "Membership not approved yet") {
-        alert(
-          "Your registration is pending admin approval. Please wait."
-        );
+        alert("Your registration is pending admin approval. Please wait.");
       } else if (msg === "Invalid phone number or Membership ID") {
         alert(
-          "Invalid Membership ID or Phone number. Please check and try again."
+          "Invalid Membership ID or Phone number. Please check and try again.",
         );
       } else {
         alert(msg || "Login failed. Please try again.");

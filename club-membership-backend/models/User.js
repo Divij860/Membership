@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
+    
     name: {
       type: String,
       required: true,
@@ -42,6 +43,15 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
 
+  approvedAt: {
+  type: Date,
+},
+
+expiryDate: {
+  type: Date,
+},
+
+
     /* ======================
        MEMBERSHIP
     ====================== */
@@ -71,6 +81,8 @@ const userSchema = new mongoose.Schema(
     },
   },
   { timestamps: true }
+
+  
 );
 
 export default mongoose.model("User", userSchema);
