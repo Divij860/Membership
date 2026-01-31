@@ -24,6 +24,7 @@ export default function MemberRegister() {
   const [alreadyRegistered, setAlreadyRegistered] = useState(false);
   const [errors, setErrors] = useState({});
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [loading, setLoading] = useState(false); // ADDED
 
   const navigate = useNavigate();
 
@@ -54,6 +55,8 @@ export default function MemberRegister() {
     if (!validateForm()) return;
 
     try {
+      setLoading(true); // ADDED
+
       const data = new FormData();
       Object.entries(formData).forEach(([k, v]) => v && data.append(k, v));
       data.append("photo", photo);
@@ -70,6 +73,8 @@ export default function MemberRegister() {
     } catch (err) {
       const msg = err.response?.data?.message || "Something went wrong";
       msg.includes("already exists") ? setAlreadyRegistered(true) : alert(msg);
+    } finally {
+      setLoading(false); // ADDED
     }
   };
 
@@ -152,7 +157,6 @@ export default function MemberRegister() {
                 onChange={handleChange}
                 className="p-2 border rounded-lg"
               />
-
             </div>
             <select
               name="bloodGroup"
@@ -188,8 +192,15 @@ export default function MemberRegister() {
             )}
           </div>
 
-          <button className="w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white py-3 rounded-xl">
-            REGISTER
+          <button
+            disabled={loading} // ADDED
+            className={`w-full text-white py-3 rounded-xl ${
+              loading
+                ? "bg-gray-500 cursor-not-allowed"
+                : "bg-gradient-to-r from-blue-700 to-blue-900"
+            }`} // ADDED
+          >
+            {loading ? "Registering..." : "REGISTER"} {/* ADDED */}
           </button>
 
           <p className="text-center text-sm mt-3">
