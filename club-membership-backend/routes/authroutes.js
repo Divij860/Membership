@@ -28,12 +28,23 @@ router.post("/register", upload.single("photo"), async (req, res) => {
   let uploadedImage = null;
 
   try {
-    const { name, email, age, phone } = req.body;
+    const {
+      name,
+      nickname,
+      email,
+      age,
+      phone,
+      bloodGroup,
+      address,
+      dob, // optional
+    } = req.body;
 
-    if (!name || !age || !phone) {
+    // ✅ Required field validation
+    if (!name || !nickname || !age || !phone || !bloodGroup || !address) {
       return res.status(400).json({
         success: false,
-        message: "Name, age, and phone are required",
+        message:
+          "Name, nickname, age, phone, blood group, and address are required",
       });
     }
 
@@ -55,16 +66,19 @@ router.post("/register", upload.single("photo"), async (req, res) => {
 
     const membershipId = await getNextMembershipId();
 
-    // ✅ Cloudinary upload handled by multer-storage-cloudinary
     uploadedImage = req.file;
 
     const user = await User.create({
       name,
+      nickname,
       email: email || null,
       age,
       phone,
-      photo: uploadedImage.path, // secure_url
-      photoId: uploadedImage.filename, // public_id
+      bloodGroup,
+      address,
+      dob: dob || null, // ✅ DOB optional
+      photo: uploadedImage.path,       // Cloudinary secure_url
+      photoId: uploadedImage.filename, // Cloudinary public_id
       membershipStatus: "pending_approval",
       membershipId,
     });
@@ -92,6 +106,7 @@ router.post("/register", upload.single("photo"), async (req, res) => {
     });
   }
 });
+
 
 /* ======================
    ADMIN LOGIN

@@ -29,7 +29,8 @@ router.get("/pending-users", adminAuth, async (req, res) => {
 ========================= */
 router.put("/approve/:id", adminAuth, async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const id = req.params.id; // ✅ define the ID
+    const user = await User.findById(id);
 
     if (!user) {
       return res.status(404).json({
@@ -42,22 +43,21 @@ router.put("/approve/:id", adminAuth, async (req, res) => {
       user.membershipId = `CLUB-${Date.now()}`;
     }
 
-    // ✅ ADD THIS LOGIC
     const approvedAt = new Date();
-
     const expiryDate = new Date(approvedAt);
     expiryDate.setFullYear(expiryDate.getFullYear() + 1);
 
-   const oneYear = 365 * 24 * 60 * 60 * 1000;
+    // update the database using the ID
+    await User.findByIdAndUpdate(id, {
+      membershipStatus: "approved",
+      approvedAt,
+      expiryDate,
+    });
 
-await User.findByIdAndUpdate(id, {
-  membershipStatus: "approved",
-  approvedAt: new Date(),
-  expiryDate: new Date(Date.now() + oneYear),
-});
-
+    // update the local user object before sending response
     user.approvedAt = approvedAt;
     user.expiryDate = expiryDate;
+    user.membershipStatus = "approved";
 
     await user.save();
 
@@ -66,12 +66,14 @@ await User.findByIdAndUpdate(id, {
       user,
     });
   } catch (error) {
+    console.error("Approve route error:", error);
     res.status(500).json({
       success: false,
       message: error.message,
     });
   }
 });
+
 
 
 /* =========================

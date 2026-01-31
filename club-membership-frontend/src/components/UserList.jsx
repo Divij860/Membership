@@ -114,10 +114,25 @@ export default function AdminUserList() {
                   key={user._id}
                   className="bg-white shadow-md rounded-2xl p-5 flex flex-col md:flex-row justify-between items-start md:items-center"
                 >
+                  <div className="flex items-center gap-4 mb-3">
+  <img
+    src={`${user.photo}`}
+    alt={user.name}
+    className="w-34 h-34 rounded-full  object-cover border mx-6"
+    onError={(e) => {
+      e.target.src = "/default-user.png"; // optional fallback
+    }}
+  />
+  </div>
                   <div className="flex-1 space-y-1">
                     <p><span className="font-medium text-gray-700">Name:</span> {user.name}</p>
+                    <p><span className="font-medium text-gray-700">Nickname:</span> {user.nickname}</p>
                     <p><span className="font-medium text-gray-700">Email:</span> {user.email}</p>
                     <p><span className="font-medium text-gray-700">Phone:</span> {user.phone}</p>
+                    <p><span className="font-medium text-gray-700">Address:</span> {user.address}</p>
+                    <p><span className="font-medium text-gray-700">BloodGroup:</span> {user.BloodGroup}</p>
+                    <p><span className="font-medium text-gray-700">Age:</span> {user.age}</p>
+                    <p><span className="font-medium text-gray-700">DOB:</span> {user.dob}</p>
                     <p><span className="font-medium text-gray-700">Membership ID:</span> {user.membershipId}</p>
                   </div>
                   <span className="mt-3 md:mt-0 px-3 py-1 rounded-full bg-green-500 text-white text-sm">

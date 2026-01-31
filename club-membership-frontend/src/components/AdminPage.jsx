@@ -44,12 +44,12 @@ export default function AdminPage() {
     }
   };
 
-  const approveUser = async (id) => {
+  const approveUser = async (user) => {
     try {
-      setActionLoading(id);
+      setActionLoading(user);
       setError("");
       const res = await axios.put(
-        `https://membership-brown.vercel.app/api/admin/approve/${id}`,
+        `https://membership-brown.vercel.app/api/admin/approve/${user}`,
         {},
         authHeader,
       );
@@ -63,12 +63,12 @@ export default function AdminPage() {
     }
   };
 
-  const rejectUser = async (id) => {
+  const rejectUser = async (user) => {
     try {
-      setActionLoading(id);
+      setActionLoading(user);
       setError("");
       await axios.put(
-        `https://membership-brown.vercel.app/api/admin/reject/${id}`,
+        `https://membership-brown.vercel.app/api/admin/reject/${user}`,
         {},
         authHeader,
       );
@@ -164,13 +164,34 @@ export default function AdminPage() {
 
                 <div className="flex-1">
                   <p>
+                    <b>Photo:</b> {user.photoId}
+                  </p>
+                  <p>
                     <b>Name:</b> {user.name}
+                  </p>
+                   <p>
+                    <b>Nickname:</b> {user.nickname}
                   </p>
                   <p>
                     <b>Email:</b> {user.email || "—"}
                   </p>
                   <p>
                     <b>Phone:</b> {user.phone}
+                  </p>
+                  <p>
+                    <b>BloodGroup:</b> {user.bloodGroup}
+                  </p>
+                  <p>
+                    <b>Address:</b> {user.address}
+                  </p>
+                   <p>
+                    <b>Age:</b> {user.age}
+                  </p>
+                   <p>
+                    <b>DOB:</b> {user.dob}
+                  </p>
+                   <p>
+                    <b>ValidUpto:</b> {user.expiryDate}
                   </p>
 
                   {user.paymentProof && (
