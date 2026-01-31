@@ -21,7 +21,7 @@ export default function AdminUserList() {
         return;
       }
 
-      const res = await axios.get("https://membership-brown.vercel.app/api/admin/all-users", {
+      const res = await axios.get("http://localhost:5000/api/admin/all-users", {
         headers: { Authorization: `Bearer ${token}` },
       });
 

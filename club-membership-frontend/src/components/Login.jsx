@@ -1,11 +1,11 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Hero from "../assets/Kings.png";           // group photo
-import Lines from "../assets/lines.png";         // left texture
-import CenterLogo from "../assets/logo-Malayalam.png";   // middle logo
-import ClubName from "../assets/logo.png";   // right text image
-import Hashtag from "../assets/hashtag.png"; 
+import Hero from "../assets/Kings.webp";           // group photo
+import Lines from "../assets/lines.webp";         // left texture
+import CenterLogo from "../assets/logo-Malayalam.webp";   // middle logo
+import ClubName from "../assets/logo.webp";   // right text image
+import Hashtag from "../assets/hashtag.webp"; 
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -29,7 +29,7 @@ export default function Login() {
 
     try {
       const res = await axios.post(
-        "https://membership-brown.vercel.app/api/member/login",
+        "http://localhost:5000/api/member/login",
         formData
       );
 
@@ -68,12 +68,14 @@ export default function Login() {
   />
 
   {/* HERO IMAGE */}
-  <div className="flex justify-center p-4 sm:p-6">
-    <img
+  <div className="flex  justify-center p-4 sm:p-6">
+    <div className="w-full relative overflow-hidden sm:w-10/12 md:max-w-10/12 h-56 sm:h-64 md:h-72 object-cover rounded-2xl">
+      <img
       src={Hero}
       alt="Kingstar Members"
-      className="w-full sm:w-10/12 md:max-w-10/12 h-56 sm:h-64 md:h-72 object-cover rounded-2xl"
+      className="absolute -bottom-25"
     />
+    </div>
   </div>
 
   {/* ACTION SECTION */}
