@@ -57,23 +57,23 @@ export default function Login() {
   <img
     src={ClubName}
     alt="Kingstar"
-    className="absolute right-2 sm:right-10 md:right-34 md:bottom-4 sm:bottom-0 h-14 sm:h-16 md:h-20"
+    className="absolute sm:translate-x-0 sm:right-2 right-20 md:right-34 md:bottom-4 bottom-25 h-14 sm:h-16 md:h-20"
   />
 
   {/* HASHTAG IMAGE */}
   <img
     src={Hashtag}
     alt="Kingstar"
-    className="absolute left-2 sm:left-3 bottom-2 sm:bottom-2 h-14 sm:h-16 md:h-15"
+    className="absolute right-18 sm:left-3  bottom-2 sm:bottom-2 h-14 sm:h-16 md:h-15"
   />
 
   {/* HERO IMAGE */}
   <div className="flex  justify-center p-4 sm:p-6">
-    <div className="w-full relative overflow-hidden sm:w-10/12 md:max-w-10/12 h-56 sm:h-64 md:h-72 object-cover rounded-2xl">
+    <div className="w-full relative overflow-hidden sm:w-10/12 md:max-w-10/12 h-72 sm:h-64 md:h-72 object-cover rounded-2xl">
       <img
       src={Hero}
       alt="Kingstar Members"
-      className="absolute -bottom-25"
+      className="absolute bottom-0 md:-bottom-25" 
     />
     </div>
   </div>

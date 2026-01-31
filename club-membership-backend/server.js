@@ -25,6 +25,7 @@ connectCloudinary();
 ====================== */
 const allowedOrigins = [
   "http://localhost:5173",
+  "https://kingstareriyapady.club",
   "https://membership-front.vercel.app",
 ];
 

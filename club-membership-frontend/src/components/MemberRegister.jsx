@@ -129,13 +129,13 @@ export default function MemberRegister() {
             </select>
           </div>
 
-          <textarea name="address" placeholder="Address" onChange={handleChange} className="h-24 p-2 border rounded-lg" />
+          <textarea name="address" placeholder="Address" onChange={handleChange} className="h-24 p-2 w-full border rounded-lg" />
 
           <div>
             <label className="block text-sm font-semibold mb-1">
               Upload Profile Photo
             </label>
-            <input type="file" accept="image/*" onChange={(e) => setPhoto(e.target.files[0])} />
+            <input type="file" accept="image/*" className="p-2 w-full border rounded-lg" onChange={(e) => setPhoto(e.target.files[0])} />
             {errors.photo && <p className="text-red-500 text-sm">{errors.photo}</p>}
           </div>
 
