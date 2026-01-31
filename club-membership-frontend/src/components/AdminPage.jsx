@@ -44,6 +44,28 @@ export default function AdminPage() {
     }
   };
 
+  const openWhatsApp = (user) => {
+  const message = `
+Membership Approved ✅
+
+Name: ${user.name}
+Nickname: ${user.nickname}
+Membership ID: ${user.membershipId || "Will be generated"}
+Phone: ${user.phone}
+Blood Group: ${user.bloodGroup}
+DOB: ${user.dob}
+Valid Upto: ${user.expiryDate}
+
+Welcome to the club 🎉
+  `;
+
+  const encodedMessage = encodeURIComponent(message);
+  const phone = user.phone.replace(/\D/g, ""); // clean number
+
+  window.open(`https://wa.me/${phone}?text=${encodedMessage}`, "_blank");
+};
+
+
   const approveUser = async (user) => {
     try {
       setActionLoading(user);
@@ -230,6 +252,14 @@ export default function AdminPage() {
                   >
                     {actionLoading === user._id ? "Processing..." : "Reject"}
                   </button>
+
+                  <button
+  onClick={() => openWhatsApp(user)}
+  className="px-4 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600 flex items-center gap-2"
+>
+  <span>WhatsApp</span>
+</button>
+
                 </div>
               </div>
             ))}

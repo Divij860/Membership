@@ -1,10 +1,10 @@
-import lines2 from "../assets/lines2.png";
-import linesflip from "../assets/lines-flip.png";
-import Logo from "../assets/logoFile.png";
-import stamp from "../assets/stamp.png";
-import signatur from "../assets/signatur.png";
-import hashtag2 from "../assets/hashtag2.png";
-import name from "../assets/name.png";
+import lines2 from "../assets/lines2.webp";
+import linesflip from "../assets/lines-flip.webp";
+import Logo from "../assets/logoFile.webp";
+import stamp from "../assets/stamp.webp";
+import signatur from "../assets/signatur.webp";
+import hashtag2 from "../assets/hashtag2.webp";
+import name from "../assets/name.webp";
 
 const MemberContent = ({ user }) => {
   if (!user) return null;

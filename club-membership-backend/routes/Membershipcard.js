@@ -30,13 +30,13 @@ router.get("/membership-card/:userId", async (req, res) => {
     /* =======================
        ASSET PATHS
     ======================= */
-    const bgPath = path.resolve("assets/card-bg.png");
-    const logoPath = path.resolve("assets/club-logo.png");
-    const stampPath = path.resolve("assets/stamp.png");
-    const signPath = path.resolve("assets/signature.png");
+    const bgPath = path.resolve("assets/card-bg.webp");
+    const logoPath = path.resolve("assets/club-logo.webp");
+    const stampPath = path.resolve("assets/stamp.webp");
+    const signPath = path.resolve("assets/signature.webp");
     const photoPath = user.photo
       ? path.resolve(user.photo)
-      : path.resolve("assets/default-user.png");
+      : path.resolve("assets/default-user.webp");
 
     /* =======================
        BACKGROUND
