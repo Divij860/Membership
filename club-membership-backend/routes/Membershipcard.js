@@ -1,5 +1,7 @@
 import express from "express";
 import PDFDocument from "pdfkit";
+import fs from "fs";
+import path from "path";
 import User from "../models/User.js";
 
 const router = express.Router();
@@ -12,86 +14,126 @@ router.get("/membership-card/:userId", async (req, res) => {
       return res.status(404).json({ message: "Membership not approved" });
     }
 
-    const startDate = new Date(user.createdAt);
-    const expiryDate = new Date(
-      new Date(startDate).setFullYear(startDate.getFullYear() + 1)
+    const doc = new PDFDocument({
+      size: [1120, 620], // same as card size
+      margin: 0,
+    });
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=MembershipCard_${user.membershipId}.pdf`
     );
 
-    const doc = new PDFDocument({
-  size: [340, 215], // ID Card size
-  margin: 0
-});
+    doc.pipe(res);
 
-doc.pipe(res);
+    /* =======================
+       ASSET PATHS
+    ======================= */
+    const bgPath = path.resolve("assets/card-bg.png");
+    const logoPath = path.resolve("assets/club-logo.png");
+    const stampPath = path.resolve("assets/stamp.png");
+    const signPath = path.resolve("assets/signature.png");
+    const photoPath = user.photo
+      ? path.resolve(user.photo)
+      : path.resolve("assets/default-user.png");
 
-/* Card Background */
-doc.rect(0, 0, 340, 215).fill("#e5e7eb");
+    /* =======================
+       BACKGROUND
+    ======================= */
+    doc.image(bgPath, 0, 0, { width: 1120, height: 620 });
 
-/* Main Card */
-doc.roundedRect(8, 8, 324, 199, 15).fill("#ffffff");
+    /* =======================
+       LOGO
+    ======================= */
+    doc.image(logoPath, 40, 40, { width: 90 });
 
-/* Header Bar */
-doc.rect(8, 8, 324, 40).fill("#1e40af");
+    /* =======================
+       HEADER TEXT
+    ======================= */
+    doc
+      .fillColor("#facc15")
+      .fontSize(38)
+      .font("Helvetica-Bold")
+      .text("KINGSTAR ERIYAPADY", 160, 40);
 
-/* Club Name */
-doc
-  .fillColor("#ffffff")
-  .fontSize(14)
-  .font("Helvetica-Bold")
-  .text("KING STAR ARTS & SPORTS CLUB", 20, 20);
+    doc
+      .fillColor("white")
+      .fontSize(18)
+      .text("KINGSTAR ARTS & SPORTS CLUB ERIYAPADY", 160, 85);
 
-/* Photo Box */
-doc
-  .roundedRect(20, 60, 80, 95, 10)
-  .stroke("#1e40af");
+    doc
+      .fontSize(12)
+      .text(
+        "Reg.No 324/98 | Affiliated to NYK-114/99 | KSYWB-KZD/B2/0005/13",
+        160,
+        110
+      );
 
-/* Member Photo */
-if (user.photo) {
-  doc.image(`uploads/${user.photo}`, 22, 62, {
-    width: 76,
-    height: 91,
-    fit: [76, 91]
-  });
-}
+    doc
+      .fillColor("#facc15")
+      .fontSize(20)
+      .text("#BecomeProudMember", 160, 145);
 
-/* Member Details */
-doc.fillColor("#000000").fontSize(10);
-doc.text(`Name`, 115, 60);
-doc.font("Helvetica-Bold").text(user.name, 115, 73);
+    /* =======================
+       PROFILE PHOTO
+    ======================= */
+    doc.circle(190, 330, 110).clip();
+    doc.image(photoPath, 80, 220, { width: 220, height: 220 });
+    doc.restore();
 
-doc.font("Helvetica").text(`Member ID`, 115, 92);
-doc.font("Helvetica-Bold").text(user.membershipId, 115, 105);
+    /* =======================
+       NAME + ID
+    ======================= */
+    doc
+      .fillColor("#ca8a04")
+      .fontSize(42)
+      .font("Helvetica-Bold")
+      .text(user.name.toUpperCase(), 350, 250);
 
-doc.font("Helvetica").text(`Phone`, 115, 124);
-doc.font("Helvetica-Bold").text(user.phone, 115, 137);
+    doc
+      .fillColor("#1f2937")
+      .fontSize(24)
+      .text(user.membershipId, 350, 300);
 
-doc.font("Helvetica").text(`Valid Till`, 115, 156);
-doc.font("Helvetica-Bold").text(
-  expiryDate.toDateString(),
-  115,
-  169
-);
+    /* =======================
+       DETAILS
+    ======================= */
+    const expiry = new Date(user.createdAt);
+    expiry.setFullYear(expiry.getFullYear() + 1);
 
-/* Status Badge */
-doc
-  .roundedRect(235, 165, 75, 22, 10)
-  .fill("#16a34a");
+    doc
+      .fontSize(18)
+      .fillColor("black")
+      .text(`FULL NAME : ${user.name}`, 80, 450)
+      .text(`MEMBERSHIP ID : ${user.membershipId}`, 80, 480)
+      .text(`MOBILE NO : ${user.phone}`, 80, 510)
+      .text(`BLOOD GROUP : ${user.bloodGroup || "N/A"}`, 80, 540)
+      .text(`VALID UPTO : ${expiry.toLocaleDateString("en-GB")}`, 80, 570);
 
-doc
-  .fillColor("#ffffff")
-  .fontSize(9)
-  .text("ACTIVE", 255, 171);
+    /* =======================
+       STAMP
+    ======================= */
+    doc.image(stampPath, 750, 400, {
+      width: 200,
+      rotate: -12,
+    });
 
-/* Footer */
-doc
-  .fillColor("#6b7280")
-  .fontSize(7)
-  .text("This card is property of Green Star Arts & Sports Club", 20, 195);
+    /* =======================
+       SIGNATURE
+    ======================= */
+    doc.image(signPath, 780, 520, { width: 180 });
 
-doc.end();
+    doc
+      .fontSize(12)
+      .fillColor("#374151")
+      .text("Authorised Signatory", 800, 570)
+      .text("Gen. Secretary", 820, 585);
+
+    doc.end();
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Error generating membership card");
+    console.error("PDF ERROR:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 

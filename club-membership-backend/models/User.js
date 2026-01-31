@@ -2,8 +2,13 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    
     name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    nickname: {
       type: String,
       required: true,
       trim: true,
@@ -16,11 +21,30 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
 
+    // DOB (NOT mandatory)
+    dob: {
+      type: Date,
+      default: null,
+    },
+
     age: {
       type: Number,
       required: true,
       min: 10,
       max: 100,
+    },
+
+    bloodGroup: {
+      type: String,
+      enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+      required: true,
+      trim: true,
+    },
+
+    address: {
+      type: String,
+      required: true,
+      trim: true,
     },
 
     phone: {
@@ -43,26 +67,20 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
 
-  approvedAt: {
-  type: Date,
-},
+    approvedAt: {
+      type: Date,
+    },
 
-expiryDate: {
-  type: Date,
-},
-
+    expiryDate: {
+      type: Date,
+    },
 
     /* ======================
        MEMBERSHIP
     ====================== */
     membershipStatus: {
       type: String,
-      enum: [
-        "registered",
-        "pending_approval",
-        "approved",
-        "rejected",
-      ],
+      enum: ["registered", "pending_approval", "approved", "rejected"],
       default: "pending_approval",
     },
 
@@ -81,8 +99,6 @@ expiryDate: {
     },
   },
   { timestamps: true }
-
-  
 );
 
 export default mongoose.model("User", userSchema);

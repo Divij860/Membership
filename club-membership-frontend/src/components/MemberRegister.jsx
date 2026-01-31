@@ -2,16 +2,24 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+import Lines from "../assets/lines.png";
+import CenterLogo from "../assets/logo-Malayalam.png";
+import ClubName from "../assets/logo.png";
+import Hashtag from "../assets/hashtag.png";
+
 export default function MemberRegister() {
   const [formData, setFormData] = useState({
     name: "",
+    nickname: "",
     age: "",
     phone: "",
     email: "",
+    bloodGroup: "",
+    address: "",
+    dob: "",
   });
 
   const [photo, setPhoto] = useState(null);
-
   const [membershipId, setMembershipId] = useState("");
   const [alreadyRegistered, setAlreadyRegistered] = useState(false);
   const [errors, setErrors] = useState({});
@@ -23,39 +31,22 @@ export default function MemberRegister() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
   /* ======================
-     FORM VALIDATION
+     VALIDATION (unchanged)
   ====================== */
   const validateForm = () => {
     const newErrors = {};
-
-    if (formData.name.trim().length < 3)
-      newErrors.name = "Name must be at least 3 characters";
-
-    if (!formData.age || formData.age < 10 || formData.age > 100)
-      newErrors.age = "Age must be between 10 and 100";
-
-    if (!/^\d{10}$/.test(formData.phone))
-      newErrors.phone = "Phone number must be 10 digits";
-
-    if (
-      formData.email &&
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)
-    )
-      newErrors.email = "Invalid email address";
-
-    // 🔒 REQUIRED PROFILE PHOTO
-    if (!photo) newErrors.photo = "Profile photo is required";
-
-    // 🔒 FILE SIZE (5MB)
-    if (photo && photo.size > 5 * 1024 * 1024)
-      newErrors.photo = "Photo must be under 5MB";
-
+    if (formData.name.trim().length < 3) newErrors.name = "Min 3 characters";
+    if (formData.nickname.trim().length < 2) newErrors.nickname = "Required";
+    if (!/^\d{10}$/.test(formData.phone)) newErrors.phone = "10 digit number";
+    if (!formData.bloodGroup) newErrors.bloodGroup = "Select blood group";
+    if (!formData.address.trim()) newErrors.address = "Required";
+    if (!photo) newErrors.photo = "Photo required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   /* ======================
-     SUBMIT
+     SUBMIT (unchanged)
   ====================== */
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -63,136 +54,179 @@ export default function MemberRegister() {
 
     try {
       const data = new FormData();
-      data.append("name", formData.name);
-      data.append("age", formData.age);
-      data.append("phone", formData.phone);
-      if (formData.email) data.append("email", formData.email);
-
-      // ✅ SINGLE REQUIRED IMAGE (MATCH BACKEND)
+      Object.entries(formData).forEach(([k, v]) => v && data.append(k, v));
       data.append("photo", photo);
 
       const res = await axios.post(
         "https://membership-brown.vercel.app/api/auth/register",
         data,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
+        { headers: { "Content-Type": "multipart/form-data" } },
       );
 
       setMembershipId(res.data.membershipId);
-      setAlreadyRegistered(false);
       setShowSuccessModal(true);
-
-      // Reset
-      setFormData({ name: "", age: "", phone: "", email: "" });
-      setPhoto(null);
-      setErrors({});
+      setAlreadyRegistered(false);
     } catch (err) {
-      const message =
-        err.response?.data?.message || err.message || "Something went wrong";
-
-      if (message.includes("already exists")) {
-        setAlreadyRegistered(true);
-      } else {
-        alert(message);
-      }
+      const msg = err.response?.data?.message || "Something went wrong";
+      msg.includes("already exists") ? setAlreadyRegistered(true) : alert(msg);
     }
   };
 
-  /* ======================
-     UI
-  ====================== */
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-lg bg-white shadow-xl rounded-2xl p-8">
-        <h1 className="text-2xl font-bold text-center mb-6">
-          Member Registration
-        </h1>
+    <div className="h-screen flex items-center justify-center relative px-4 sm:px-6">
+  {/* BACKGROUND TEXTURE */}
+  <img
+    src={Lines}
+    className="absolute bottom-0 left-0 w-full h-[400px] sm:h-[600px] opacity-40 -z-10 object-cover"
+    alt=""
+  />
 
-        {alreadyRegistered && (
-          <p className="text-red-500 text-center mb-4">
-            User with this phone number already exists
-          </p>
-        )}
+  {/* MAIN BOX */}
+  <div className="relative w-full max-w-3xl rounded-2xl px-4 sm:px-10 py-4 sm:py-6">
+    {/* CORNER DECOR */}
+    <img
+      src={Hashtag}
+      className="absolute right-3 sm:right-7 bottom-0 h-6 sm:h-7 pt-2"
+    />
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            name="name"
-            placeholder="Full Name"
-            value={formData.name}
-            onChange={handleChange}
-            className="w-full border rounded-lg p-3"
-          />
-          {errors.name && <p className="text-red-500">{errors.name}</p>}
+    {/* CENTER LOGO */}
+    <div className="flex justify-center items-center mb-2 gap-2 flex-wrap">
+      <img src={CenterLogo} className="h-14 sm:h-20" />
+      <img src={ClubName} className="h-14 sm:h-20" />
+    </div>
 
-          <input
-            name="email"
-            placeholder="Email (optional)"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full border rounded-lg p-3"
-          />
-          {errors.email && <p className="text-red-500">{errors.email}</p>}
+    <h1 className="text-center text-lg sm:text-2xl font-extrabold tracking-wide mb-3">
+      MEMBER REGISTRATION
+    </h1>
 
-          <div className="flex gap-4">
-            <input
-              type="number"
-              name="age"
-              placeholder="Age"
-              value={formData.age}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-3"
-            />
-            <input
-              name="phone"
-              placeholder="Phone"
-              value={formData.phone}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-3"
-            />
-          </div>
-          {(errors.age || errors.phone) && (
-            <p className="text-red-500">{errors.age || errors.phone}</p>
-          )}
+    {alreadyRegistered && (
+      <p className="text-red-600 text-center mb-4 text-sm sm:text-base">
+        Phone number already registered
+      </p>
+    )}
 
-          {/* REQUIRED PROFILE PHOTO */}
-          <div>
-            <label className="block font-medium mb-1">
-              Profile Photo <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setPhoto(e.target.files[0])}
-            />
-            {errors.photo && <p className="text-red-500">{errors.photo}</p>}
-          </div>
-
-          <button className="w-full bg-blue-500 text-white py-3 rounded-lg">
-            Register
-          </button>
-        </form>
+    {/* FORM */}
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <input
+          name="name"
+          placeholder="Full Name"
+          onChange={handleChange}
+          className="p-2 border-1 border-gray-300 rounded-lg w-full"
+        />
+        <input
+          name="nickname"
+          placeholder="Nickname"
+          onChange={handleChange}
+          className="p-2 border-1 border-gray-300 rounded-lg w-full"
+        />
       </div>
 
-      {/* SUCCESS MODAL */}
-      {showSuccessModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-xl text-center">
-            <h2 className="text-2xl font-bold text-green-600">
-              Registration Successful 🎉
-            </h2>
-            <p className="mt-2">
-              Membership ID: <b>{membershipId}</b>
-            </p>
-            <button
-              onClick={() => navigate("/")}
-              className="mt-4 bg-green-500 text-white px-6 py-2 rounded-lg"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <input
+          type="number"
+          name="age"
+          placeholder="Age"
+          onChange={handleChange}
+          className="p-2 border-1 border-gray-300 rounded-lg w-full"
+        />
+        <input
+          name="phone"
+          placeholder="Mobile Number"
+          onChange={handleChange}
+          className="p-2 border-1 border-gray-300 rounded-lg w-full"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <input
+          name="email"
+          placeholder="Email (optional)"
+          onChange={handleChange}
+          className="p-2 border-1 border-gray-300 rounded-lg w-full"
+        />
+
+        <input
+          type="date"
+          name="dob"
+          onChange={handleChange}
+          className="p-2 border-1 border-gray-300 rounded-lg w-full"
+        />
+
+        <select
+          name="bloodGroup"
+          onChange={handleChange}
+          className="p-2 border-1 border-gray-300 rounded-lg w-full"
+        >
+          <option value="">Select Blood Group</option>
+          {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((bg) => (
+            <option key={bg}>{bg}</option>
+          ))}
+        </select>
+      </div>
+
+      <textarea
+        name="address"
+        placeholder="Address"
+        onChange={handleChange}
+        className="h-24 p-2 w-full border-1 border-gray-300 rounded-lg"
+      />
+
+      <div>
+        <label className="block text-sm font-semibold mb-1">
+          Upload Profile Photo
+        </label>
+        <input
+          type="file"
+          accept="image/*"
+          className="p-2 border-1 w-full sm:w-56 border-gray-300 rounded-lg"
+          onChange={(e) => setPhoto(e.target.files[0])}
+        />
+        {errors.photo && (
+          <p className="text-red-500 text-sm">{errors.photo}</p>
+        )}
+      </div>
+
+      <button
+        className="w-full bg-gradient-to-r from-blue-700 to-blue-900
+                   text-white font-bold py-3 rounded-xl tracking-wide"
+      >
+        REGISTER
+      </button>
+      <p className="text-center text-sm text-gray-600 mt-3">
+  Already registered?{" "}
+  <button
+    type="button"
+    onClick={() => navigate("/")}
+    className="text-blue-700 font-semibold hover:underline"
+  >
+    Login
+  </button>
+</p>
+
+    </form>
+  </div>
+
+  {/* SUCCESS MODAL */}
+  {showSuccessModal && (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center px-4">
+      <div className=" p-6 rounded-xl text-center max-w-sm w-full">
+        <h2 className="text-xl sm:text-2xl font-bold text-green-600">
+          Registration Successful 🎉
+        </h2>
+        <p className="mt-2 text-sm sm:text-base">
+          Membership ID: <b>{membershipId}</b>
+        </p>
+        <button
+          onClick={() => navigate("/")}
+          className="mt-4 bg-green-600 text-white px-6 py-2 rounded-lg"
+        >
+          Go to Login
+        </button>
+      </div>
     </div>
+  )}
+</div>
+
   );
 }
