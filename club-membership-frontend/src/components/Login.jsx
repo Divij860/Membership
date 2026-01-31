@@ -29,7 +29,7 @@ export default function Login() {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/member/login",
+        "https://membership-brown.vercel.app/api/member/login",
         formData
       );
 

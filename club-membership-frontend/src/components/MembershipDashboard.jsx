@@ -19,7 +19,7 @@ export default function MemberDashboard() {
     }
 
     axios
-      .get(`http://localhost:5000/api/user/${userId}`, {
+      .get(`https://membership-brown.vercel.app/api/user/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -42,7 +42,7 @@ export default function MemberDashboard() {
   //     const userId = localStorage.getItem("userId");
 
   //     const response = await axios.get(
-  //       `http://localhost:5000/api/membership-card/${userId}`,
+  //       `https://membership-brown.vercel.app/api/membership-card/${userId}`,
   //       {
   //         responseType: "blob",
   //         headers: { Authorization: `Bearer ${token}` },
